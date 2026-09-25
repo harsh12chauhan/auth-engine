@@ -31,7 +31,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<UserResponseDto> authenticate(@Valid @RequestBody UserLoginRequestDto user){
-        return ResponseEntity.status(HttpStatus.FOUND).body(authenticationService.authenticateUser(user));
+        return ResponseEntity.ok(authenticationService.authenticateUser(user));
     }
 
     @GetMapping("/all")
