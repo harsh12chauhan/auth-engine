@@ -4,8 +4,13 @@ import com.auth_engine.dto.UserLoginRequestDto;
 import com.auth_engine.dto.UserRequestDto;
 import com.auth_engine.dto.UserResponseDto;
 import com.auth_engine.entity.User;
+import com.auth_engine.exception.EmailAlreadyExistsException;
+import com.auth_engine.exception.InvalidCredentialsException;
+import com.auth_engine.exception.UsernameAlreadyExistsException;
 import com.auth_engine.repository.UserRepository;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.Email;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -28,16 +33,16 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     }
 
     @Override
-    public UserResponseDto createUser(UserRequestDto userRequestDto) {
+    public UserResponseDto createUser(UserRequestDto userRequestDto) throws EmailAlreadyExistsException, UsernameAlreadyExistsException {
 
         Optional<User> userOptional = userRepository.findByEmail(userRequestDto.getEmail());
         if(userOptional.isPresent()){
-            throw new RuntimeException("User with email already exist's.");
+            throw new EmailAlreadyExistsException("User with email already exists.");
         }
 
         userOptional= userRepository.findByUsername(userRequestDto.getUsername());
         if(userOptional.isPresent()){
-            throw new RuntimeException("User with username already exist's.");
+            throw new UsernameAlreadyExistsException("User with username already exists.");
         }
 
         User newUser = new User();
@@ -53,14 +58,14 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     }
 
     @Override
-    public UserResponseDto authenticateUser(UserLoginRequestDto userLoginRequestDto){
+    public UserResponseDto authenticateUser(UserLoginRequestDto userLoginRequestDto) throws InvalidCredentialsException{
 
-        User user = userRepository.findByEmail(userLoginRequestDto.getEmail()).orElseThrow(()-> new RuntimeException("Invalid user credentials"));
+        User user = userRepository.findByEmail(userLoginRequestDto.getEmail()).orElseThrow(()-> new InvalidCredentialsException("Invalid user credentials"));
 
         boolean isPasswordValid = passwordEncoder.matches(userLoginRequestDto.getPassword(),user.getHashedPassword());
 
         if(!isPasswordValid){
-            throw new RuntimeException("Invalid user credentials");
+            throw new InvalidCredentialsException("Invalid user credentials");
         }
 
         return UserResponseDtoMapper(user);
