@@ -31,14 +31,14 @@ public class AuthenticationServiceImpl implements AuthenticationService{
         newUser.setHashedPassword(passwordEncoder.encode(user.getPassword()));
         newUser.setEnabled(true);
 
-        userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
 
         UserResponseDto dto = new UserResponseDto();
-        dto.setId(newUser.getId());
-        dto.setEmail(newUser.getEmail());
-        dto.setUsername(newUser.getUsername());
-        dto.setCreatedAt(newUser.getCreatedAt());
-        dto.setEnabled(newUser.isEnabled());
+        dto.setId(savedUser.getId());
+        dto.setEmail(savedUser.getEmail());
+        dto.setUsername(savedUser.getUsername());
+        dto.setCreatedAt(savedUser.getCreatedAt());
+        dto.setEnabled(savedUser.isEnabled());
 
         return dto;
     }
