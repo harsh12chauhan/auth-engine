@@ -4,6 +4,7 @@ import com.auth_engine.dto.UserRequestDto;
 import com.auth_engine.dto.UserResponseDto;
 import com.auth_engine.service.AuthenticationService;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class AuthenticationController {
     }
 
     @PostMapping()
-    public ResponseEntity<UserResponseDto> register(@RequestBody UserRequestDto user, HttpMethod httpMethod){
+    public ResponseEntity<UserResponseDto> register(@Valid @RequestBody UserRequestDto user){
         return ResponseEntity.status(HttpStatus.CREATED).body(authenticationService.createUser(user));
     }
 

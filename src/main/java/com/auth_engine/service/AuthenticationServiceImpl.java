@@ -4,8 +4,11 @@ import com.auth_engine.dto.UserRequestDto;
 import com.auth_engine.dto.UserResponseDto;
 import com.auth_engine.entity.User;
 import com.auth_engine.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,14 +36,7 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 
         User savedUser = userRepository.save(newUser);
 
-        UserResponseDto dto = new UserResponseDto();
-        dto.setId(savedUser.getId());
-        dto.setEmail(savedUser.getEmail());
-        dto.setUsername(savedUser.getUsername());
-        dto.setCreatedAt(savedUser.getCreatedAt());
-        dto.setEnabled(savedUser.isEnabled());
-
-        return dto;
+        return UserResponseDtoMapper(savedUser);
     }
 
     @Override
@@ -51,17 +47,25 @@ public class AuthenticationServiceImpl implements AuthenticationService{
         List<UserResponseDto> userDtoList = new ArrayList<>();
 
         for(var user:users){
-
-            UserResponseDto tempDto = new UserResponseDto();
-            tempDto.setId(user.getId());
-            tempDto.setEmail(user.getEmail());
-            tempDto.setUsername(user.getUsername());
-            tempDto.setCreatedAt(user.getCreatedAt());
-            tempDto.setEnabled(user.isEnabled());
-
-            userDtoList.add(tempDto);
+            userDtoList.add(UserResponseDtoMapper(user));
         }
 
         return userDtoList;
     }
+
+
+    // Utils
+    private static @NonNull UserResponseDto UserResponseDtoMapper(User savedUser) {
+
+        UserResponseDto dto = new UserResponseDto();
+
+        dto.setId(savedUser.getId());
+        dto.setEmail(savedUser.getEmail());
+        dto.setUsername(savedUser.getUsername());
+        dto.setCreatedAt(savedUser.getCreatedAt());
+        dto.setEnabled(savedUser.isEnabled());
+
+        return dto;
+    }
+
 }
