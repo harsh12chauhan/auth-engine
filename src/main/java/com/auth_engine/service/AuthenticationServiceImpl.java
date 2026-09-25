@@ -1,5 +1,6 @@
 package com.auth_engine.service;
 
+import com.auth_engine.dto.TokenResponseDto;
 import com.auth_engine.dto.UserLoginRequestDto;
 import com.auth_engine.dto.UserRequestDto;
 import com.auth_engine.dto.UserResponseDto;
@@ -9,10 +10,8 @@ import com.auth_engine.exception.InvalidCredentialsException;
 import com.auth_engine.exception.UsernameAlreadyExistsException;
 import com.auth_engine.repository.UserRepository;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.constraints.Email;
+import com.auth_engine.security.token.JwtService;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,10 +25,12 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthenticationServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder){
+    public AuthenticationServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -58,9 +59,10 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     }
 
     @Override
-    public UserResponseDto authenticateUser(UserLoginRequestDto userLoginRequestDto) throws InvalidCredentialsException{
+    public TokenResponseDto authenticateUser(UserLoginRequestDto userLoginRequestDto) throws InvalidCredentialsException{
 
-        User user = userRepository.findByEmail(userLoginRequestDto.getEmail()).orElseThrow(()-> new InvalidCredentialsException("Invalid user credentials"));
+        User user = userRepository.findByEmail(userLoginRequestDto.getEmail())
+                .orElseThrow(()-> new InvalidCredentialsException("Invalid user credentials"));
 
         boolean isPasswordValid = passwordEncoder.matches(userLoginRequestDto.getPassword(),user.getHashedPassword());
 
@@ -68,7 +70,13 @@ public class AuthenticationServiceImpl implements AuthenticationService{
             throw new InvalidCredentialsException("Invalid user credentials");
         }
 
-        return UserResponseDtoMapper(user);
+        String token = jwtService.generateToken(user.getId().toString());
+
+        TokenResponseDto tokenDto = new TokenResponseDto();
+        tokenDto.setAccessToken(token);
+        tokenDto.setTokenType("Bearer");
+
+        return tokenDto;
     }
 
     @Override

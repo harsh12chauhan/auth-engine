@@ -1,5 +1,6 @@
 package com.auth_engine.controller;
 
+import com.auth_engine.dto.TokenResponseDto;
 import com.auth_engine.dto.UserLoginRequestDto;
 import com.auth_engine.dto.UserRequestDto;
 import com.auth_engine.dto.UserResponseDto;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController()
-@RequestMapping("/api/auth")
+@RequestMapping("/api")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
@@ -24,13 +25,13 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @PostMapping()
+    @PostMapping("/auth")
     public ResponseEntity<UserResponseDto> register(@Valid @RequestBody UserRequestDto user){
         return ResponseEntity.status(HttpStatus.CREATED).body(authenticationService.createUser(user));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<UserResponseDto> authenticate(@Valid @RequestBody UserLoginRequestDto user){
+    @PostMapping("/auth/login")
+    public ResponseEntity<TokenResponseDto> authenticate(@Valid @RequestBody UserLoginRequestDto user){
         return ResponseEntity.ok(authenticationService.authenticateUser(user));
     }
 
