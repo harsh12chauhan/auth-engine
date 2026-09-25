@@ -1,5 +1,6 @@
 package com.auth_engine.dto;
 
+import com.auth_engine.enums.Role;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,6 @@ public class UserResponseDto {
     private String username;
     private String email;
     private boolean isEnabled;
+    private Role role;
     private LocalDateTime createdAt;
-
 }

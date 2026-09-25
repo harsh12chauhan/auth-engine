@@ -1,5 +1,6 @@
 package com.auth_engine.entity;
 
+import com.auth_engine.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,10 @@ public class User {
 
     @Column(nullable = false)
     private String hashedPassword;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     private boolean isEnabled;
 

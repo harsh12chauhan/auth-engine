@@ -5,6 +5,7 @@ import com.auth_engine.dto.UserLoginRequestDto;
 import com.auth_engine.dto.UserRequestDto;
 import com.auth_engine.dto.UserResponseDto;
 import com.auth_engine.entity.User;
+import com.auth_engine.enums.Role;
 import com.auth_engine.exception.EmailAlreadyExistsException;
 import com.auth_engine.exception.InvalidCredentialsException;
 import com.auth_engine.exception.UsernameAlreadyExistsException;
@@ -52,6 +53,7 @@ public class AuthenticationServiceImpl implements AuthenticationService{
         newUser.setEmail(userRequestDto.getEmail());
         newUser.setHashedPassword(passwordEncoder.encode(userRequestDto.getPassword()));
         newUser.setEnabled(true);
+        newUser.setRole(Role.USER);
 
         User savedUser = userRepository.save(newUser);
 
@@ -70,7 +72,10 @@ public class AuthenticationServiceImpl implements AuthenticationService{
             throw new InvalidCredentialsException("Invalid user credentials");
         }
 
-        String token = jwtService.generateToken(user.getId().toString());
+        String token = jwtService.generateToken(
+                user.getId().toString(),
+                user.getRole().name()
+        );
 
         TokenResponseDto tokenDto = new TokenResponseDto();
         tokenDto.setAccessToken(token);

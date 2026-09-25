@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,4 +46,8 @@ public class AuthenticationController {
         return ResponseEntity.ok("Testing");
     }
 
+    @GetMapping("/admin")
+    public ResponseEntity<String> adminTest() {
+        return ResponseEntity.ok("Admin access granted");
+    }
 }

@@ -4,5 +4,5 @@ import org.springframework.stereotype.Service;
 
 public interface JwtService {
 
-    public String generateToken(String subject);
+    public String generateToken(String subject, String role);
 }
