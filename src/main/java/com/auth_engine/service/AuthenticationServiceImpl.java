@@ -4,6 +4,7 @@ import com.auth_engine.dto.UserRequestDto;
 import com.auth_engine.dto.UserResponseDto;
 import com.auth_engine.entity.User;
 import com.auth_engine.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,18 +14,21 @@ import java.util.List;
 public class AuthenticationServiceImpl implements AuthenticationService{
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthenticationServiceImpl(UserRepository userRepository){
+    public AuthenticationServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserResponseDto createUser(UserRequestDto user) {
 
         User newUser = new User();
-        newUser.setEmail(user.getEmail());
-        newUser.setHashedPassword(user.getPassword());
+
         newUser.setUsername(user.getUsername());
+        newUser.setEmail(user.getEmail());
+        newUser.setHashedPassword(passwordEncoder.encode(user.getPassword()));
         newUser.setEnabled(true);
 
         userRepository.save(newUser);
