@@ -1,5 +1,6 @@
 package com.auth_engine.controller;
 
+import com.auth_engine.dto.UserLoginRequestDto;
 import com.auth_engine.dto.UserRequestDto;
 import com.auth_engine.dto.UserResponseDto;
 import com.auth_engine.service.AuthenticationService;
@@ -26,6 +27,11 @@ public class AuthenticationController {
     @PostMapping()
     public ResponseEntity<UserResponseDto> register(@Valid @RequestBody UserRequestDto user){
         return ResponseEntity.status(HttpStatus.CREATED).body(authenticationService.createUser(user));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserResponseDto> authenticate(@Valid @RequestBody UserLoginRequestDto user){
+        return ResponseEntity.status(HttpStatus.FOUND).body(authenticationService.authenticateUser(user));
     }
 
     @GetMapping("/all")
