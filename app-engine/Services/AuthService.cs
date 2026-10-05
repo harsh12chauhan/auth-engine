@@ -6,7 +6,6 @@ using app_engine.Interfaces;
 using app_engine.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 
 namespace app_engine.Services
 {
@@ -14,40 +13,16 @@ namespace app_engine.Services
     {
         public async Task<UserResponse> AuthenticateUser(UserLoginRequest userLoginRequest)
         {
-            var total = Stopwatch.StartNew();
-
             var connection = _context.Database.GetDbConnection();
-
-            var connectionTimer = Stopwatch.StartNew();
 
             if (connection.State != System.Data.ConnectionState.Open)
             {
                 await connection.OpenAsync();
             }
 
-            connectionTimer.Stop();
-
-            Console.WriteLine(
-                $"DB connection open: {connectionTimer.ElapsedMilliseconds} ms"
-            );
-
-            var queryTimer = Stopwatch.StartNew();
-
             var user = await _context.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Email == userLoginRequest.Email);
-
-            queryTimer.Stop();
-
-            Console.WriteLine(
-                $"DB query: {queryTimer.ElapsedMilliseconds} ms"
-            );
-
-            total.Stop();
-
-            Console.WriteLine(
-                $"DB total: {total.ElapsedMilliseconds} ms"
-            );
 
             if (user is null)
             {
@@ -60,14 +35,12 @@ namespace app_engine.Services
             //    throw new ApiException("Invalid user credentials",StatusCodes.Status401Unauthorized);
             //}
 
-            var isPasswordValid = new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash,userLoginRequest.Password);
+            var isPasswordValid = new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, userLoginRequest.Password);
 
-            if (isPasswordValid == PasswordVerificationResult.Failed) {
+            if (isPasswordValid == PasswordVerificationResult.Failed)
+            {
                 throw new ApiException("Invalid user credentials", StatusCodes.Status401Unauthorized);
             }
-
-            //Console.WriteLine($"Password verification: {sw.ElapsedMilliseconds} ms");
-            //sw.Restart();
 
             return new UserResponse
             {
@@ -93,7 +66,7 @@ namespace app_engine.Services
             if (IsEmailAlreadyExist || IsUsrenameAlreadyExist)
             {
 
-                throw new ApiException("user with email or username already exits",StatusCodes.Status409Conflict);
+                throw new ApiException("user with email or username already exits", StatusCodes.Status409Conflict);
             }
 
             User newUser = new User
